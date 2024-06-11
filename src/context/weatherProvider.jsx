@@ -17,6 +17,7 @@ const WeatherProvider = ({ children }) => {
     const [ sunset, setSunset ] = useState('')
     const [ date, setDate ] = useState('')
     const [ city, setCity ] = useState('Buenos Aires')
+    const [ error, setError] = useState(false)
     const [ tempNow, setTempNow ] = useState()
     const [ tempMin, setTempMin ] = useState()
     const [ tempMax, setTempMax ] = useState()
@@ -25,12 +26,12 @@ const WeatherProvider = ({ children }) => {
         const getWeather = async () => {
             setSpinner(true)
             const appId = import.meta.env.VITE_API_KEY
-            const url = `http://api.openweathermap.org/geo/1.0/direct?q=${city},${country}&limit=1&appid=${appId}`
+            const url = `https://api.openweathermap.org/geo/1.0/direct?q=${city},${country}&limit=1&appid=${appId}`
             
             try {
             const { data } = await axios(url)
             const { lat, lon } = data[0]
-            const urlClima = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appId}`
+            const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appId}`
             const { data: clima} = await axios(urlClima)
 
             setDataWeather(clima)
@@ -76,7 +77,7 @@ const WeatherProvider = ({ children }) => {
             setSunset(new Date((sunset + timezone) * 1000).toLocaleTimeString('es-ES', {timeStyle: 'short'}))
 
             } catch (error) {
-                console.log(error)
+                setError(true)
             } finally {
                 setSpinner(false)
                 setShow(true)
@@ -85,8 +86,6 @@ const WeatherProvider = ({ children }) => {
         getWeather()
         
     }, [city])
-
-    
 
   return (
     <ContextWeather.Provider
@@ -108,6 +107,7 @@ const WeatherProvider = ({ children }) => {
             spinner,
             setShow,
             show,
+            error,
         }}
     >
         {children}
